@@ -4,13 +4,13 @@ Use the arrow keys to shift the ref grid over the image
 and the +/- keys (without control or shift) to change the
 degree the image is posterised (K changes are hard to notice).
 
+Usage: python draw.py image.jpg projName
+
 Author: Yohan de Rose
 
 TODO:
-- Clicking stops functionality
+- Clicking on image stops grid moving functionality
 - Moving grid far enough will show empty areas
-- More cmd line control
-- Saving project dir with two grid images with and without poster
 """
 
 import cv2
@@ -18,6 +18,7 @@ import numpy as np
 import sys
 import tty
 import termios
+import os
 
 xLines = []
 yLines = []
@@ -113,13 +114,23 @@ def main():
             display = shiftGrid(regions.copy(), 1, -SHIFT_SIZE)
         elif k == 61:
             K += 8
-            draw(img.copy())
+            display, regions = draw(img.copy())
         elif k == 45:
             K -= 8
-            draw(img.copy())
-        # else:
-        #     if k != -1:
-        #         print(k)
+            display, regions = draw(img.copy())
+        elif k == 115:  # saving into project dir
+            # print(sys.argv)
+            projName = sys.argv[2]
+            os.makedirs(projName)
+
+            cv2.imwrite(projName + '/grid.png', drawGrid(img.copy()))
+            cv2.imwrite(projName + '/grid-poster.png', display)
+
+            print('Done.')
+            break
+        else:
+            if k != -1:
+                print(k)
 
         # Reshow in case of updates
         cv2.imshow('image', display)
